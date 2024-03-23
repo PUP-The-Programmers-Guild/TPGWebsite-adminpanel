@@ -1,11 +1,21 @@
-import { Inter } from '@next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import LoginForm from '@/components/login/LoginForm';
+import { Flex } from '@adobe/react-spectrum';
 
 export default function Home() {
+
+  const loginOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let formData = Object.fromEntries(new FormData(e.currentTarget));
+
+    //Submit to backend API
+  }
+
   return (
     <>
-      <h1>Test</h1>
+      <Flex direction="column" alignItems="center" justifyContent="center" height="calc(100vh)">
+          <LoginForm onSubmit={loginOnSubmit}/>
+      </Flex>
     </>
   )
 }
