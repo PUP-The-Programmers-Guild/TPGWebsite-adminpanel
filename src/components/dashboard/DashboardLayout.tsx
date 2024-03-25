@@ -1,10 +1,14 @@
-import { Grid, View } from "@adobe/react-spectrum";
+import { Grid, View, Divider } from "@adobe/react-spectrum";
+import DashboardSidebar from "./DashboardSidebar";
+import DashboardHeader from "./DashboardHeader";
+import EventDashboard from "./events/EventTable";
+import DashboardFooter from "./DashboardFooter";
 
 interface IDashboardLayoutProps {
-    children: React.ReactNode;
+    children: string | JSX.Element | JSX.Element[] | React.ReactNode | React.ReactNode[];
 }
 
-export default function DashboardLayout() {
+export default function DashboardLayout({children} : IDashboardLayoutProps) {
     return (
         <Grid
             areas={[
@@ -12,14 +16,14 @@ export default function DashboardLayout() {
                 'sidebar content',
                 'footer   footer'
             ]}
-            columns={['1fr', '3fr']}
-            rows={['size-675', 'auto', 'size-675']}
+            columns={['1fr', '6fr']}
+            rows={['size-675', 'auto', 'size-325']}
             height="calc(100vh)"
         >
-            <View backgroundColor="celery-600" gridArea="header" />
-            <View backgroundColor="blue-600" gridArea="sidebar" />
-            <View backgroundColor="purple-600" gridArea="content" />
-            <View backgroundColor="magenta-600" gridArea="footer" />
+            <DashboardHeader />
+            <DashboardSidebar />
+            {children}
+            <DashboardFooter />
         </Grid>
     )
 }
