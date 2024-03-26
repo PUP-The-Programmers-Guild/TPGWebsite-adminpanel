@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
     "@adobe/react-spectrum",
+    "@react-spectrum/toast",
     "@react-spectrum/actionbar",
     "@react-spectrum/avatar",
     "@react-spectrum/inlinealert",
