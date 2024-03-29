@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 interface IFAQsTableRowProps {
-    id: number;
+    id: string;
     title: string;
     description: string;
 }
@@ -27,20 +27,28 @@ export default function FaqsTable() {
             return {items: json.faqs};
         }
     })
-    const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [activeEdit, setActiveEdit] = useState<boolean>(false);
     const [activeDelete, setActiveDelete] = useState<boolean>(false);
     const [activeAdd, setActiveAdd] = useState<boolean>(true);
 
-    const [selectedRowInfo, setSelectedRowInfo] = useState<IFAQsTableRowProps>();
-    const [updatedRowInfo, setUpdatedRowInfo] = useState<IFAQsTableRowProps>();
+    const [selectedRowInfo, setSelectedRowInfo] = useState<IFAQsTableRowProps>({
+        id: "",
+        title: "",
+        description: ""
+    });
+    const [updatedRowInfo, setUpdatedRowInfo] = useState<IFAQsTableRowProps>({
+        id: "",
+        title: "",
+        description: ""
+    });
 
     useEffect(() => {
         if (selectedRows.size === 1) {
             setActiveAdd(false)
             setActiveDelete(true)
             setActiveEdit(true)
-            setSelectedRowInfo(faqsData.items.find((faq) => faq.id === Array.from(selectedRows)[0]) )
+            setSelectedRowInfo(faqsData.items.find((faq) => faq.id === Array.from(selectedRows)[0]) || {id: "", title: "", description: ""})
         } else if (selectedRows.size > 1) {
             setActiveEdit(false)
             setActiveDelete(true)
@@ -87,9 +95,24 @@ export default function FaqsTable() {
                                         <Divider />
                                         <Content>
                                             <Form maxWidth="size-3600">
-                                                <TextField label="FAQ ID" value={String(updatedRowInfo?.id)} isReadOnly isDisabled />
-                                                <TextField label="Title" value={updatedRowInfo?.title} onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "title": value}))}/>
-                                                <TextField label="Description" value={updatedRowInfo?.description} onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "description": value}))}/>
+                                                <TextField 
+                                                    label="FAQ ID" 
+                                                    value={String(updatedRowInfo?.id)} 
+                                                    isReadOnly 
+                                                    isDisabled
+                                                />
+                                                <TextField 
+                                                    label="Title" 
+                                                    value={updatedRowInfo?.title} 
+                                                    onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "title": value}))}
+                                                    isDisabled={selectedRowInfo.title === ""}
+                                                />
+                                                <TextField 
+                                                    label="Description" 
+                                                    value={updatedRowInfo?.description} 
+                                                    isDisabled={selectedRowInfo.description === ""}
+                                                    onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "description": value}))}
+                                                />
                                             </Form>
                                         </Content>
                                         <ButtonGroup>
@@ -139,7 +162,7 @@ export default function FaqsTable() {
                     aria-label="Example table with static contents"
                     selectionMode="multiple"
                     selectedKeys={selectedRows}
-                    onSelectionChange={setSelectedRows}
+                    onSelectionChange={(selected) => setSelectedRows(new Set([...selected].map(String)))}
                     overflowMode="truncate"
                     minHeight={100}
                 >
