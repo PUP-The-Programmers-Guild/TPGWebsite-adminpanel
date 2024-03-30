@@ -1,24 +1,28 @@
-import { View, Text, Divider, Button, ButtonGroup, Flex, useAsyncList, DialogTrigger, Form, Dialog, Heading, Content, Header, TextField } from "@adobe/react-spectrum";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/router";
+
+import { View, Text, Divider, Button, ButtonGroup, Flex, useAsyncList } from "@adobe/react-spectrum";
 import { Cell, Column, Row, TableView, TableBody, TableHeader } from '@adobe/react-spectrum'
+
 import Add from '@spectrum-icons/workflow/Add';
-import Edit from '@spectrum-icons/workflow/Edit';
-import Delete from '@spectrum-icons/workflow/Delete';
 import Filter from "@spectrum-icons/workflow/Filter";
 import GraphBarHorizontal from "@spectrum-icons/workflow/GraphBarHorizontal";
 import Refresh from "@spectrum-icons/workflow/Refresh";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 
-interface IFAQsTableRowProps {
-    id: string;
-    title: string;
-    description: string;
+import FaqsRemoveDialog from "./FaqsRemoveDialog";
+import FaqsUpdateDialog from "./FaqsUpdateDialog";
+import { IFAQsTableRowProps } from "./FaqsTable.interface";
+
+interface IFaqTableCRUDBtnActive {
+    activeEdit: boolean;
+    activeDelete: boolean;
+    activeAdd: boolean;
 }
 
 export default function FaqsTable() {
     const FAQS_COLUMNS = [{key:"id", name: "FAQ ID"}, {key:"title", name: "FAQ Title"}, {key:"description", name: "FAQ Description"}];
     const router = useRouter();
-
+    
     let faqsData = useAsyncList<IFAQsTableRowProps>({
         async load({signal}) {
             const url = process.env.NEXT_PUBLIC_BACKEND_API_URL
@@ -28,37 +32,38 @@ export default function FaqsTable() {
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-    const [activeEdit, setActiveEdit] = useState<boolean>(false);
-    const [activeDelete, setActiveDelete] = useState<boolean>(false);
-    const [activeAdd, setActiveAdd] = useState<boolean>(true);
 
     const [selectedRowInfo, setSelectedRowInfo] = useState<IFAQsTableRowProps>({
         id: "",
         title: "",
         description: ""
     });
-    const [updatedRowInfo, setUpdatedRowInfo] = useState<IFAQsTableRowProps>({
-        id: "",
-        title: "",
-        description: ""
-    });
 
-    useEffect(() => {
+    const crudButtonActive = useMemo<IFaqTableCRUDBtnActive>(() => {
         if (selectedRows.size === 1) {
-            setActiveAdd(false)
-            setActiveDelete(true)
-            setActiveEdit(true)
-            setSelectedRowInfo(faqsData.items.find((faq) => faq.id === Array.from(selectedRows)[0]) || {id: "", title: "", description: ""})
+            setSelectedRowInfo(
+                faqsData.items.find((faq) => faq.id === Array.from(selectedRows)[0]) 
+                || {id: "", title: "", description: ""}
+            )
+            return {
+                activeAdd: false,
+                activeDelete: true,
+                activeEdit: true
+            }
         } else if (selectedRows.size > 1) {
-            setActiveEdit(false)
-            setActiveDelete(true)
-            setActiveEdit(false)
+            return {
+                activeAdd: false,
+                activeDelete: true,
+                activeEdit: false
+            }
         } else {
-            setActiveAdd(true)
-            setActiveDelete(false)
-            setActiveEdit(false)
+            return {
+                activeAdd: true,
+                activeDelete: false,
+                activeEdit: false
+            } 
         }
-    }, [selectedRows, selectedRowInfo, faqsData])
+    }, [faqsData.items, selectedRows])
 
     return (
         <View gridArea="content" overflow="hidden">
@@ -66,88 +71,41 @@ export default function FaqsTable() {
             <View borderYWidth="thin" borderColor="dark" padding="size-100">
                 <Flex justifyContent="space-between">
                     <Flex gap="size-125">
+
                         <ButtonGroup>
-                            <Button variant="secondary" style="fill">
+                            <Button variant="secondary" style="fill" isDisabled={true}>
                                 <Filter size="XXS"/>
                                 <Text>Filter</Text>
                             </Button>
-                            <Button variant="secondary" style="fill">
+                            <Button variant="secondary" style="fill" isDisabled={true}>
                                 <GraphBarHorizontal />
                                 <Text>Sort</Text>
                             </Button>
                         </ButtonGroup>
+
                         <Divider size="S" orientation="vertical" />
                         <ButtonGroup>
-                            <Button variant="accent" style="fill" isDisabled={!activeAdd} onPress={() => router.push("/dashboard/faqs/add")}>
+                            <Button 
+                                variant="accent" 
+                                style="fill" 
+                                isDisabled={!crudButtonActive.activeAdd} 
+                                onPress={() => router.push("/dashboard/faqs/add")}
+                            >
                                 <Add />
                                 <Text>Add</Text>
                             </Button>
-
-                            <DialogTrigger>
-                                <Button variant="secondary" style="fill" isDisabled={!activeEdit} onPress={() => setUpdatedRowInfo(selectedRowInfo)}>
-                                    <Edit />
-                                    <Text>Edit</Text>
-                                </Button>
-
-                                {(close) => (
-                                    <Dialog>
-                                        <Heading>Edit FAQ</Heading>
-                                        <Divider />
-                                        <Content>
-                                            <Form maxWidth="size-3600">
-                                                <TextField 
-                                                    label="FAQ ID" 
-                                                    value={String(updatedRowInfo?.id)} 
-                                                    isReadOnly 
-                                                    isDisabled
-                                                />
-                                                <TextField 
-                                                    label="Title" 
-                                                    value={updatedRowInfo?.title} 
-                                                    onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "title": value}))}
-                                                    isDisabled={selectedRowInfo.title === ""}
-                                                />
-                                                <TextField 
-                                                    label="Description" 
-                                                    value={updatedRowInfo?.description} 
-                                                    isDisabled={selectedRowInfo.description === ""}
-                                                    onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "description": value}))}
-                                                />
-                                            </Form>
-                                        </Content>
-                                        <ButtonGroup>
-                                            <Button variant="secondary" onPress={close}>Cancel</Button>
-                                            <Button variant="accent" onPress={close}>Confirm</Button>
-                                        </ButtonGroup>
-                                    </Dialog>
-                                )}
-                            </DialogTrigger>
-
-                            <DialogTrigger>
-                                <Button variant="negative" style="fill" isDisabled={!activeDelete}>
-                                    <Delete />
-                                    <Text>Remove</Text>
-                                </Button>
-
-                                {(close) => (
-                                    <Dialog>
-                                        <Heading>Remove FAQ(s)?</Heading>
-                                        <Divider />
-                                        <Content>
-                                            <Header>
-                                                Are you sure you want to remove the selected FAQ(s)?
-                                            </Header>
-                                            <Flex flex="col" gap="size-100">
-                                                {Array.from(selectedRows).map((id) => <Text key={id}><b>{id}</b></Text>)}
-                                            </Flex>
-                                        </Content>
-                                        <ButtonGroup>
-                                            <Button variant="secondary" onPress={close}>Cancel</Button>
-                                            <Button variant="negative" onPress={close}>Confirm</Button>
-                                        </ButtonGroup>
-                                    </Dialog>
-                                )}
-                            </DialogTrigger>
+                            <FaqsUpdateDialog 
+                                activeEdit={crudButtonActive.activeEdit} 
+                                selectedRowInfo={selectedRowInfo} 
+                                setSelectedRows={setSelectedRows}
+                                faqsData={faqsData} 
+                            />
+                            <FaqsRemoveDialog 
+                                activeDelete={crudButtonActive.activeDelete} 
+                                selectedRows={selectedRows} 
+                                faqsData={faqsData} 
+                                setSelectedRows={setSelectedRows} 
+                            />
                         </ButtonGroup>
                     </Flex>
                     <Button variant="secondary" onPress={() => faqsData.reload()}>
