@@ -1,7 +1,7 @@
 import { Grid, View, Divider } from "@adobe/react-spectrum";
 import DashboardSidebar from "./DashboardSidebar";
 import DashboardHeader from "./DashboardHeader";
-import EventDashboard from "./events/EventTable";
+import EventDashboard from "./events/EventsTable";
 import DashboardFooter from "./DashboardFooter";
 
 interface IDashboardLayoutProps {
