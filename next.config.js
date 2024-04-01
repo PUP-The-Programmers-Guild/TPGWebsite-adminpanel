@@ -14,6 +14,7 @@ const nextConfig = {
     "@react-spectrum/toast",
     "@react-spectrum/actionbar",
     "@react-spectrum/avatar",
+    "@react-spectrum/dropzone",
     "@react-spectrum/inlinealert",
     "@react-spectrum/tag",
     "@react-spectrum/actiongroup",
