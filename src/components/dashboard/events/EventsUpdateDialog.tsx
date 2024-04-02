@@ -1,11 +1,12 @@
 import { DialogTrigger, Button, Dialog, Heading, Divider, Content, Form, Text, TextField, ButtonGroup, Checkbox, CheckboxGroup, DatePicker, TextArea } from "@adobe/react-spectrum";
 import { ToastQueue } from "@react-spectrum/toast";
 import Edit  from "@spectrum-icons/workflow/Edit";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IEventsDataProps, IEventsTableRowProps, IEventsUpdateDialogProps, IUploadImageData } from "./EventsTable.interface";
 import { onEventRowUpdate } from "./EventUpdatedialogFunctions";
 import { ImageDropField } from "./EventImageDropField";
-import { parseDate, parseZonedDateTime } from "@internationalized/date";
+import { CalendarDate, parseDate, parseZonedDateTime } from "@internationalized/date";
+import EventBadge from "./EventBadge";
 
 
 export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, eventsData, setSelectedRows} : IEventsUpdateDialogProps) {
@@ -29,10 +30,10 @@ export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, events
         imageType: null
     });
 
-    const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
+    const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([""]);
 
     let onPressUpdate = (close: any) => {
-        onEventRowUpdate(updatedRowInfo, imageData)
+        onEventRowUpdate(selectedRowInfo, updatedRowInfo, imageData, selectedEventTypes)
             .then((isSuccess: boolean) => {
                 if (isSuccess) {
                     eventsData.reload();
@@ -41,6 +42,7 @@ export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, events
                 }
             });
     };
+
     return (
         <DialogTrigger>
             <Button variant="secondary" style="fill" isDisabled={!activeEdit} 
@@ -72,20 +74,52 @@ export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, events
                                 isRequired minLength={10} 
                                 maxLength={35}
                                 value={updatedRowInfo.title}
+                                onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "title": value}))}
                             />
-                            <DatePicker name="start_date" label="Start Date" isRequired /* value={parseDateTime(updatedRowInfo.start_date)} *//>
-                            <DatePicker name="end_date" label="End Date" isRequired /* value={parseDateTime(updatedRowInfo.end_date)} *//>
-                            <TextArea name="description" label="Event Description" isRequired minLength={10} value={updatedRowInfo.description}/>
+                            <DatePicker 
+                                name="start_date" 
+                                label="Start Date" 
+                                isRequired 
+                                value={updatedRowInfo.start_date ? parseDate(updatedRowInfo.start_date) : null}
+                                onChange={(value: CalendarDate) => setUpdatedRowInfo((prevState) => ({...prevState, "start_date": value.toString()}))}
+                            />
+                            <DatePicker 
+                                name="end_date" 
+                                label="End Date" 
+                                isRequired 
+                                value={updatedRowInfo.end_date ? parseDate(updatedRowInfo.end_date) : null}
+                                onChange={(value: CalendarDate) => setUpdatedRowInfo((prevState) => ({...prevState, "end_date": value.toString()}))}
+                            />
+                            <TextArea 
+                                name="description" 
+                                label="Event Description" 
+                                isRequired 
+                                minLength={10} 
+                                value={updatedRowInfo.description}
+                                onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "description": value}))}
+                            />
                             <CheckboxGroup
                                 label="Event Type"
                                 isEmphasized
                                 value={selectedEventTypes}
-                                onChange={(newValues : string[]) => setSelectedEventTypes(newValues)}
+                                onChange={setSelectedEventTypes}
                             >
-                                {EVENT_TYPES.map((type) => <Checkbox value={type} key={type}>{type}</Checkbox>)}
+                                {
+                                    EVENT_TYPES.map((type) => 
+                                        <Checkbox value={type} key={type}>
+                                            <EventBadge key={type} eventType={type}/>
+                                        </Checkbox>
+                                    )
+                                }
                             </CheckboxGroup>
                             
-                            <TextField name="facebook_url" label="Facebook URL" isRequired type="url" value={updatedRowInfo.facebook_url}/>
+                            <TextField 
+                                name="facebook_url"
+                                label="Facebook URL" 
+                                isRequired type="url" 
+                                value={updatedRowInfo.facebook_url}
+                                onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "facebook_url": value}))}
+                            />
                         </Form>
                     </Content>
                     
