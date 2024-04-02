@@ -32,6 +32,7 @@ export default function FaqsTable() {
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  
     const [selectedRowInfo, setSelectedRowInfo] = useState<IFAQsTableRowProps>({
         id: "",
         title: "",
