@@ -6,6 +6,7 @@ import React from "react";
 import { onImageDrop, onImageSelect, onEventAddFormSubmit } from "./EventsAddFormFunctions";
 import { IUploadImageData } from "./EventsTable.interface";
 import { ImageDropField } from "./EventImageDropField";
+import EventBadge from "./EventBadge";
 
 
 interface IEventsAddForm {
@@ -50,7 +51,13 @@ export default function EventsAddForm({ routeSuccessCallback }: IEventsAddForm) 
                     value={selectedEventTypes}
                     onChange={(newValues : string[]) => setSelectedEventTypes(newValues)}
                 >
-                    {EVENT_TYPES.map((type) => <Checkbox value={type} key={type}>{type}</Checkbox>)}
+                    {
+                        EVENT_TYPES.map((type) => 
+                        <Checkbox value={type} key={type}>
+                            <EventBadge key={type} eventType={type}/>
+                        </Checkbox>
+                        )
+                    }
                 </CheckboxGroup>
                 
                 <TextField name="facebook_url" label="Facebook URL" isRequired type="url"/>

@@ -14,18 +14,20 @@ export interface IEventsTableRowProps {
     date_updated: string;
 }
 
+export type TEventDataFields = "id" | "title" | "start_date" | "end_date" | "description" | "event_type" | "image_url" | "facebook_url" | "date_created" | "date_updated";
 export interface IEventsDataProps {
-    id: string;
-    title: string;
-    start_date: string;
-    end_date: string;
-    description: string;
-    event_type: string;
+    event_id?: string; // placeholder
+    id?: string;
+    title?: string;
+    start_date?: string;
+    end_date?: string;
+    description?: string;
+    event_type?: string;
     image_url?: string;
     image_type?: string;
-    facebook_url: string;
-    date_created: string;
-    date_updated: string;
+    facebook_url?: string;
+    date_created?: string;
+    date_updated?: string;
 }
 
 export interface IEventsUpdateDialogProps {
