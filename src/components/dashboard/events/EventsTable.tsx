@@ -10,6 +10,7 @@ import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import EventsUpdateDialog from "./EventsUpdateDialog";
 import EventsRemoveDialog from "./EventsRemoveDialog";
+import EventBadge from "./EventBadge";
 
 interface IEventsTableCRUDBtnActive {
     activeEdit: boolean;
@@ -164,7 +165,13 @@ export default function EventsTable() {
                                 <Cell>{event.start_date}</Cell>
                                 <Cell>{event.end_date}</Cell>
                                 <Cell>{event.description}</Cell>
-                                <Cell>{event.event_type}</Cell>
+                                <Cell>
+                                    {JSON.parse(event.event_type).map(
+                                        (eventType: string) => 
+                                            <EventBadge key={`${event.title}-${eventType}`} eventType={eventType.toUpperCase()}/>
+                                        )
+                                    }
+                                </Cell>
                                 <Cell>{event.image_url}</Cell>
                                 <Cell>{event.facebook_url}</Cell>
                                 <Cell>{event.date_created}</Cell>
