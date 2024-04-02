@@ -1,16 +1,32 @@
 import { ToastQueue } from "@react-spectrum/toast";
 import { IEventsDataProps, IUploadImageData} from "./EventsTable.interface";
+import type { TEventDataFields } from "./EventsTable.interface";
 
-export const onEventRowUpdate = async (updatedRowInfo: IEventsDataProps, updatedImage: IUploadImageData) : Promise<boolean> => {
-    if (updatedImage.base64String && updatedImage.imageType) {
-        updatedRowInfo["image_url"] = updatedImage.base64String as string;
-        updatedRowInfo["image_type"] = updatedImage.imageType as string;
+export const onEventRowUpdate = async (selectedRowInfo: IEventsDataProps, updatedRowInfo: IEventsDataProps, updatedImage: IUploadImageData, updatedEventTags: string[]) : Promise<boolean> => {
+    const payload = { ...updatedRowInfo };
+    // placeholder solution: need to modify update_event route to accept id instead of event_id
+        payload["event_id"] = payload["id"];
+        delete payload["id"];
+    payload["event_type"] = JSON.stringify(updatedEventTags);
+    for (const key in payload) {
+        if (selectedRowInfo[key as TEventDataFields] === payload[key as TEventDataFields] && key !== "id") {
+            delete payload[key as TEventDataFields];
+        }
     }
-    let formData = updatedRowInfo;
+    if (updatedImage.base64String === null && updatedImage.imageType === null) {
+        delete payload["image_url"];
+    } else {
+        payload["image_url"] = updatedImage.base64String as string;
+        payload["image_type"] = updatedImage.imageType as string;
+    }
+    let formData = payload;
     let url = "/api/update_event";
     let isSuccess = false;
-    console.log(formData);
-/*     await fetch(url, {
+    if (Object.keys(formData).length === 1 && Object.keys(formData)[0] === "id") {
+        ToastQueue.neutral("No changes detected. Please make changes to update.", {timeout: 3500})
+        return isSuccess;
+    }
+    await fetch(url, {
         headers: { 
             'Content-Type': 'application/json', 
             'Access-Control-Allow-Origin':'*',
@@ -31,5 +47,5 @@ export const onEventRowUpdate = async (updatedRowInfo: IEventsDataProps, updated
         ToastQueue.negative(`Failed to update Event. ${error}`, {timeout: 3500})
         isSuccess = false;
     });
-    return isSuccess; */
+    return isSuccess;
 };
