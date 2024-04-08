@@ -12,6 +12,7 @@ import EventsRemoveDialog from "./EventsRemoveDialog";
 import EventBadge from "./EventBadge";
 import RevalidateCacheDialog from "../shared/RevalidateCacheDialog";
 
+
 interface IEventsTableCRUDBtnActive {
     activeEdit: boolean;
     activeDelete: boolean;
