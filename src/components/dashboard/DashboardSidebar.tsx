@@ -3,8 +3,6 @@ import { useRouter } from 'next/router'
 
 const ROUTING_OPTIONS = [
     { label: 'Events', path: '/dashboard/events' },
-    { label: 'Members', path: '/dashboard/members' },
-    { label: 'Membership Application', path: '/dashboard/members/applications' },
     { label: 'FAQs', path: '/dashboard/faqs' },
 ]
 

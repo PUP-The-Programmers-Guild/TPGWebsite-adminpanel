@@ -1,16 +1,16 @@
-import { View, Header, Text, Divider, Button, ButtonGroup, Flex, useAsyncList } from "@adobe/react-spectrum";
+import { View, Text, Divider, Button, ButtonGroup, Flex, useAsyncList } from "@adobe/react-spectrum";
 import { Cell, Column, Row, TableView, TableBody, TableHeader } from '@adobe/react-spectrum'
 import Add from '@spectrum-icons/workflow/Add';
-import Delete from '@spectrum-icons/workflow/Delete';
 import Filter from "@spectrum-icons/workflow/Filter";
 import GraphBarHorizontal from "@spectrum-icons/workflow/GraphBarHorizontal";
 import Refresh from "@spectrum-icons/workflow/Refresh";
 import { IEventsTableRowProps } from "./EventsTable.interface";
-import { use, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import EventsUpdateDialog from "./EventsUpdateDialog";
 import EventsRemoveDialog from "./EventsRemoveDialog";
 import EventBadge from "./EventBadge";
+import RevalidateCacheDialog from "../shared/RevalidateCacheDialog";
 
 interface IEventsTableCRUDBtnActive {
     activeEdit: boolean;
@@ -41,6 +41,7 @@ export default function EventsTable() {
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+    const [isCacheDialogOpen, setIsCacheDialogOpen] = useState<boolean>(false);
     const [selectedRowInfo, setSelectedRowInfo] = useState<IEventsTableRowProps>({
         id: "",
         title: "",
@@ -134,10 +135,17 @@ export default function EventsTable() {
                             
                         </ButtonGroup>
                     </Flex>
-                    <Button variant="secondary" onPress={() => eventsData.reload()}>
-                        <Refresh />
-                        <Text>Refresh</Text>
-                    </Button>
+                    <Flex gap={"size-150"}>
+                        <RevalidateCacheDialog 
+                            dataType="events"
+                            isCacheDialogOpen={isCacheDialogOpen}
+                            setIsCacheDialogOpen={setIsCacheDialogOpen}
+                        />
+                        <Button variant="secondary" onPress={() => eventsData.reload()}>
+                            <Refresh />
+                            <Text>Refresh Table</Text>
+                        </Button>
+                    </Flex>
                 </Flex>
             </View>
             <View paddingX="size-100">

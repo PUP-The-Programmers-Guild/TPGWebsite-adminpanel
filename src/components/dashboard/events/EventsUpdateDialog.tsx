@@ -1,8 +1,7 @@
 import { DialogTrigger, Button, Dialog, Heading, Divider, Content, Form, Text, TextField, ButtonGroup, Checkbox, CheckboxGroup, DatePicker, TextArea } from "@adobe/react-spectrum";
-import { ToastQueue } from "@react-spectrum/toast";
 import Edit  from "@spectrum-icons/workflow/Edit";
-import { useEffect, useState } from "react";
-import { IEventsDataProps, IEventsTableRowProps, IEventsUpdateDialogProps, IUploadImageData } from "./EventsTable.interface";
+import { useState } from "react";
+import { IEventsDataProps, IEventsUpdateDialogProps, IUploadImageData } from "./EventsTable.interface";
 import { onEventRowUpdate } from "./EventUpdatedialogFunctions";
 import { ImageDropField } from "./EventImageDropField";
 import { CalendarDate, parseDate, parseZonedDateTime } from "@internationalized/date";
@@ -72,7 +71,7 @@ export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, events
                                 name="title" 
                                 label="Event Title" 
                                 isRequired minLength={10} 
-                                maxLength={35}
+                                maxLength={100}
                                 value={updatedRowInfo.title}
                                 onChange={(value: string) => setUpdatedRowInfo((prevState) => ({...prevState, "title": value}))}
                             />
