@@ -12,6 +12,7 @@ import Refresh from "@spectrum-icons/workflow/Refresh";
 import FaqsRemoveDialog from "./FaqsRemoveDialog";
 import FaqsUpdateDialog from "./FaqsUpdateDialog";
 import { IFAQsTableRowProps } from "./FaqsTable.interface";
+import RevalidateCacheDialog from "../shared/RevalidateCacheDialog";
 
 interface IFaqTableCRUDBtnActive {
     activeEdit: boolean;
@@ -32,7 +33,7 @@ export default function FaqsTable() {
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  
+    const [isCacheDialogOpen, setIsCacheDialogOpen] = useState<boolean>(false);
     const [selectedRowInfo, setSelectedRowInfo] = useState<IFAQsTableRowProps>({
         id: "",
         title: "",
@@ -108,10 +109,17 @@ export default function FaqsTable() {
                             />
                         </ButtonGroup>
                     </Flex>
+                    <Flex>
+                    <RevalidateCacheDialog 
+                        dataType="faqs"
+                        isCacheDialogOpen={isCacheDialogOpen}
+                        setIsCacheDialogOpen={setIsCacheDialogOpen}
+                    />
                     <Button variant="secondary" onPress={() => faqsData.reload()}>
                         <Refresh />
                         <Text>Refresh</Text>
                     </Button>
+                    </Flex>
                 </Flex>
             </View>
 
