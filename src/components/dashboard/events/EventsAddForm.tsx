@@ -3,7 +3,7 @@ import { Breadcrumbs, Button, ButtonGroup, Checkbox, CheckboxGroup, DatePicker,
         Form, Item, Picker, TextArea, TextField, View } from "@adobe/react-spectrum";
 import { useState } from "react";
 import React from "react";
-import { onImageDrop, onImageSelect, onEventAddFormSubmit } from "./EventsAddFormFunctions";
+import { onEventAddFormSubmit } from "./EventsAddFormFunctions";
 import { IUploadImageData } from "./EventsTable.interface";
 import { ImageDropField } from "./EventImageDropField";
 import EventBadge from "./EventBadge";
@@ -23,8 +23,6 @@ export default function EventsAddForm({ routeSuccessCallback }: IEventsAddForm) 
     });
 
     const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
-
-
     return (
         <View gridArea="content" overflow="auto">
             <View borderYWidth="thin" borderColor="dark" padding="size-40" >
@@ -41,7 +39,7 @@ export default function EventsAddForm({ routeSuccessCallback }: IEventsAddForm) 
                 marginX="size-130"
             >
                 <ImageDropField thisImageState={imageData} thisImageStateSetter={setImageData}/>
-                <TextField name="title" label="Event Title" isRequired minLength={10} maxLength={35}/>
+                <TextField name="title" label="Event Title" isRequired minLength={10} maxLength={100}/>
                 <DatePicker name="start_date" label="Start Date" isRequired />
                 <DatePicker name="end_date" label="End Date" isRequired />
                 <TextArea name="description" label="Event Description" isRequired minLength={10}/>

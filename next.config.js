@@ -6,6 +6,11 @@ const nextConfig = {
         source: '/api/:path*',
         destination: `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/:path*`
       },
+      // BFF = Backend For Frontend
+      {
+        source: '/bff/:path*',
+        destination: `${process.env.NEXT_PUBLIC_BFF_API_URL}/:path*`
+      }
     ]
   },
   reactStrictMode: true,
