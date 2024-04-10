@@ -10,6 +10,10 @@ const nextConfig = {
       {
         source: '/bff/:path*',
         destination: `${process.env.NEXT_PUBLIC_BFF_API_URL}/:path*`
+      },
+      {
+        source: '/dashboard',
+        destination: '/dashboard/events'
       }
     ]
   },
