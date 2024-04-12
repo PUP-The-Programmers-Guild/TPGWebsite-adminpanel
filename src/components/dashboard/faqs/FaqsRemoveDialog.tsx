@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Content, Dialog, DialogTrigger, Divider, Flex, Header, Heading, Text } from "@adobe/react-spectrum";
+import { Button, ButtonGroup, Content, Dialog, DialogTrigger, Divider, Flex, Header, Heading, Item, ListBox, Text } from "@adobe/react-spectrum";
 import { ToastQueue } from "@react-spectrum/toast";
 import Delete from "@spectrum-icons/workflow/Delete";
 import { IFaqsRemoveDialogProps } from "./FaqsTable.interface";
@@ -56,9 +56,9 @@ export default function FaqsRemoveDialog({ activeDelete, selectedRows, setSelect
                         <Header>
                             Are you sure you want to remove the selected FAQ(s)?
                         </Header>
-                        <Flex flex="col" gap="size-100">
-                            {Array.from(selectedRows).map((id) => <Text key={id}><b>{id}</b></Text>)}
-                        </Flex>
+                        <ListBox width="size-6000" aria-label="Events to be deleted">
+                            {Array.from(selectedRows).map((id) => <Item key={id}>{id}</Item>)}
+                        </ListBox>
                     </Content>
                     <ButtonGroup>
                         <Button variant="secondary" onPress={close}>Cancel</Button>

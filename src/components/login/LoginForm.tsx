@@ -28,9 +28,6 @@ export default function LoginForm(props: ILoginFormProps) {
             }
         }).catch(error => {
             ToastQueue.negative(`Failed to log in. ${error}`, {timeout: 2500})
-            //console.error(error)
-            //console.log(url)
-            //console.log(formData)
         })
     };
     return (
