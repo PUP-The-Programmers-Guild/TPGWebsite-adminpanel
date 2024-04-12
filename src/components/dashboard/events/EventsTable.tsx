@@ -1,16 +1,16 @@
-import { View, Text, Divider, Button, ButtonGroup, Flex, useAsyncList } from "@adobe/react-spectrum";
+import { View, Text, Button, ButtonGroup, Flex, useAsyncList, useCollator } from "@adobe/react-spectrum";
 import { Cell, Column, Row, TableView, TableBody, TableHeader } from '@adobe/react-spectrum'
 import Add from '@spectrum-icons/workflow/Add';
-import Filter from "@spectrum-icons/workflow/Filter";
-import GraphBarHorizontal from "@spectrum-icons/workflow/GraphBarHorizontal";
 import Refresh from "@spectrum-icons/workflow/Refresh";
 import { IEventsTableRowProps } from "./EventsTable.interface";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import EventsUpdateDialog from "./EventsUpdateDialog";
-import EventsRemoveDialog from "./EventsRemoveDialog";
 import EventBadge from "./EventBadge";
 import RevalidateCacheDialog from "../shared/RevalidateCacheDialog";
+import dynamic from "next/dynamic";
+
+const EventsUpdateDialog = dynamic(() => import("./EventsUpdateDialog"));
+const EventsRemoveDialog = dynamic(() => import("./EventsRemoveDialog"));
 
 interface IEventsTableCRUDBtnActive {
     activeEdit: boolean;
@@ -19,6 +19,8 @@ interface IEventsTableCRUDBtnActive {
 }
 
 export default function EventsTable() {
+    let collator = useCollator({ numeric: true });
+    
     const router = useRouter();
     const EVENT_COLUMNS = [
         {key: "id", name: "Event ID"}, 
@@ -38,6 +40,19 @@ export default function EventsTable() {
             let res = await fetch(url, {signal});
             let json = await res.json();
             return {items: json.events};
+        },
+        async sort({ items, sortDescriptor } : { items: IEventsTableRowProps[], sortDescriptor: any}) {
+            return {
+                items: items.sort((a : any, b : any) => {
+                    let first = a[sortDescriptor.column];
+                    let second = b[sortDescriptor.column];
+                    let cmp = collator.compare(first, second);
+                    if (sortDescriptor.direction === 'descending') {
+                        cmp *= -1;
+                    }
+                    return cmp;
+                })
+            };
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -54,7 +69,7 @@ export default function EventsTable() {
         date_created: "",
         date_updated: ""
     });
-
+    
     const crudButtonActive = useMemo<IEventsTableCRUDBtnActive>(() => {
         if (selectedRows.size === 1) {
             setSelectedRowInfo(
@@ -99,18 +114,6 @@ export default function EventsTable() {
                 <Flex justifyContent="space-between">
                     <Flex gap="size-125">
                         <ButtonGroup>
-                            <Button variant="secondary" style="fill" isDisabled={true}>
-                                <Filter size="XXS"/>
-                                <Text>Filter</Text>
-                            </Button>
-                            <Button variant="secondary" style="fill" isDisabled={true}>
-                                <GraphBarHorizontal />
-                                <Text>Sort</Text>
-                            </Button>
-                        </ButtonGroup>
-                        <Divider size="S" orientation="vertical" />
-                        <ButtonGroup>
-
                             <Button 
                                 variant="accent" 
                                 style="fill" 
@@ -132,7 +135,6 @@ export default function EventsTable() {
                                 eventsData={eventsData} 
                                 setSelectedRows={setSelectedRows} 
                             />
-                            
                         </ButtonGroup>
                     </Flex>
                     <Flex gap={"size-150"}>
@@ -150,16 +152,24 @@ export default function EventsTable() {
             </View>
             <View paddingX="size-100">
                 <TableView
-                    aria-label="Example table with static contents"
+                    aria-label="Events Data Table"
                     selectionMode="multiple"
                     overflowMode="truncate"
-                    minHeight={100}
+                    minHeight={100} 
                     selectedKeys={selectedRows}
-                    onSelectionChange={(selected) => setSelectedRows(new Set([...selected].map(String)))}
+                    onSelectionChange={(selected) => {
+                        if (selected === "all") {
+                            setSelectedRows(new Set(eventsData.items.map((event) => event.id).map(String)))
+                        } else {
+                            setSelectedRows(new Set([...selected].map(String)))
+                        }
+                    }}
+                    onSortChange={eventsData.sort}
+                    sortDescriptor={eventsData.sortDescriptor}
                 >
-                    <TableHeader>
+                    <TableHeader columns={EVENT_COLUMNS}>
                         {EVENT_COLUMNS.map((column) => (
-                            <Column key={column.key} allowsResizing defaultWidth={125}>{column.name}</Column>
+                            <Column key={column.key} allowsResizing defaultWidth={125} allowsSorting={column.key !== "event_type"}>{column.name} </Column>
                         ))}
                     </TableHeader>
                     <TableBody

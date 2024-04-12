@@ -1,18 +1,16 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/router";
-
-import { View, Text, Divider, Button, ButtonGroup, Flex, useAsyncList } from "@adobe/react-spectrum";
+import { View, Text,Button, ButtonGroup, Flex, useAsyncList, useCollator } from "@adobe/react-spectrum";
 import { Cell, Column, Row, TableView, TableBody, TableHeader } from '@adobe/react-spectrum'
-
 import Add from '@spectrum-icons/workflow/Add';
-import Filter from "@spectrum-icons/workflow/Filter";
-import GraphBarHorizontal from "@spectrum-icons/workflow/GraphBarHorizontal";
 import Refresh from "@spectrum-icons/workflow/Refresh";
-
-import FaqsRemoveDialog from "./FaqsRemoveDialog";
-import FaqsUpdateDialog from "./FaqsUpdateDialog";
 import { IFAQsTableRowProps } from "./FaqsTable.interface";
 import RevalidateCacheDialog from "../shared/RevalidateCacheDialog";
+import dynamic from "next/dynamic";
+
+const FaqsUpdateDialog = dynamic(() => import("./FaqsUpdateDialog"));
+const FaqsRemoveDialog = dynamic(() => import("./FaqsRemoveDialog"));
+
 
 interface IFaqTableCRUDBtnActive {
     activeEdit: boolean;
@@ -23,6 +21,7 @@ interface IFaqTableCRUDBtnActive {
 export default function FaqsTable() {
     const FAQS_COLUMNS = [{key:"id", name: "FAQ ID"}, {key:"title", name: "FAQ Title"}, {key:"description", name: "FAQ Description"}];
     const router = useRouter();
+    let collator = useCollator({ numeric: true });
     
     let faqsData = useAsyncList<IFAQsTableRowProps>({
         async load({signal}) {
@@ -30,6 +29,19 @@ export default function FaqsTable() {
             let res = await fetch(`${url}/get_faqs`, {signal});
             let json = await res.json();
             return {items: json.faqs};
+        },
+        async sort({ items, sortDescriptor } : { items: IFAQsTableRowProps[], sortDescriptor: any}) {
+            return {
+                items: items.sort((a : any, b : any) => {
+                    let first = a[sortDescriptor.column];
+                    let second = b[sortDescriptor.column];
+                    let cmp = collator.compare(first, second);
+                    if (sortDescriptor.direction === 'descending') {
+                        cmp *= -1;
+                    }
+                    return cmp;
+                })
+            };
         }
     })
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -68,23 +80,9 @@ export default function FaqsTable() {
 
     return (
         <View gridArea="content" overflow="hidden">
-
             <View borderYWidth="thin" borderColor="dark" padding="size-100">
                 <Flex justifyContent="space-between">
                     <Flex gap="size-125">
-
-                        <ButtonGroup>
-                            <Button variant="secondary" style="fill" isDisabled={true}>
-                                <Filter size="XXS"/>
-                                <Text>Filter</Text>
-                            </Button>
-                            <Button variant="secondary" style="fill" isDisabled={true}>
-                                <GraphBarHorizontal />
-                                <Text>Sort</Text>
-                            </Button>
-                        </ButtonGroup>
-
-                        <Divider size="S" orientation="vertical" />
                         <ButtonGroup>
                             <Button 
                                 variant="accent" 
@@ -125,16 +123,24 @@ export default function FaqsTable() {
 
             <View paddingX="size-100">
                 <TableView
-                    aria-label="Example table with static contents"
+                    aria-label="FAQ Data Table"
                     selectionMode="multiple"
                     selectedKeys={selectedRows}
-                    onSelectionChange={(selected) => setSelectedRows(new Set([...selected].map(String)))}
+                    onSelectionChange={(selected) => {
+                        if (selected === "all") {
+                            setSelectedRows(new Set(faqsData.items.map((faq) => faq.id).map(String)))
+                        } else {
+                            setSelectedRows(new Set([...selected].map(String)))
+                        }
+                    }}
                     overflowMode="truncate"
                     minHeight={100}
+                    onSortChange={faqsData.sort}
+                    sortDescriptor={faqsData.sortDescriptor}
                 >
-                    <TableHeader>
+                    <TableHeader columns={FAQS_COLUMNS}>
                         {FAQS_COLUMNS.map((column) => (
-                            <Column key={column.key} allowsResizing defaultWidth={125}>{column.name}</Column>
+                            <Column key={column.key} allowsResizing allowsSorting defaultWidth={125}>{column.name}</Column>
                         ))}
                     </TableHeader>
                     <TableBody
