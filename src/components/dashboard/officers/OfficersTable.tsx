@@ -97,7 +97,7 @@ export default function OfficersTable() {
     useEffect(() => {
         officersData.reload();
         setSelectedRows(new Set())
-    }, [officersData, selectedOffice])
+    }, [selectedOffice])
     
     return (
         <View gridArea="content" overflow="hidden">
