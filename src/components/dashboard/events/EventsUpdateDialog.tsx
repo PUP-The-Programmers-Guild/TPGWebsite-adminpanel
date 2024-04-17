@@ -1,17 +1,18 @@
 import { DialogTrigger, Button, Dialog, Heading, Divider, Content, Form, Text, TextField, ButtonGroup, Checkbox, CheckboxGroup, DatePicker, TextArea } from "@adobe/react-spectrum";
 import Edit  from "@spectrum-icons/workflow/Edit";
 import { useState } from "react";
-import { IEventsDataProps, IEventsUpdateDialogProps, IUploadImageData } from "./EventsTable.interface";
+import { IEventsDataProps, IEventsUpdateDialogProps } from "./EventsTable.interface";
 import { onEventRowUpdate } from "./EventUpdatedialogFunctions";
 import { ImageDropField } from "./EventImageDropField";
-import { CalendarDate, parseDate, parseZonedDateTime } from "@internationalized/date";
+import { CalendarDate, parseDate } from "@internationalized/date";
 import EventBadge from "./EventBadge";
+import { IUploadImageData } from "../shared/FileUploadFunctions";
 
 
 export default function EventsUpdateDialog({ activeEdit, selectedRowInfo, eventsData, setSelectedRows} : IEventsUpdateDialogProps) {
     const EVENT_TYPES = ["FLAGSHIP", "WEBINAR", "EXTERNAL", "PODCAST", "TPG-EXCLUSIVE"];
 
-    const [updatedRowInfo, setUpdatedRowInfo] = useState<IEventsDataProps>(                {
+    const [updatedRowInfo, setUpdatedRowInfo] = useState<IEventsDataProps>({
         id: "",
         title: "",
         start_date: "",

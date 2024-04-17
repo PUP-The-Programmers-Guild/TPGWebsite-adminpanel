@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 const ROUTING_OPTIONS = [
     { label: 'Events', path: '/dashboard/events' },
     { label: 'FAQs', path: '/dashboard/faqs' },
+    { label: 'Officers', path: '/dashboard/officers'}
 ]
 
 export default function DashboardSidebar() {

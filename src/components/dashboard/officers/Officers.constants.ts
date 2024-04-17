@@ -1,0 +1,17 @@
+export const OFFICE_TYPES = [
+    'President', 
+    'Internal Affairs', 
+    'External Affairs', 
+    'Records', 
+    'Finance', 
+    'Audit',
+    'Membership and Student Affairs', 
+    'Documentation',
+    'Research Extension', 
+    'Research and Assessment',
+    'Programmer',
+    'Media Production', 
+    'Public Relations', 
+    'Social Media', 
+    'Logistics',
+]
