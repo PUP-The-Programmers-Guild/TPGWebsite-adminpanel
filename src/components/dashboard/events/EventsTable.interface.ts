@@ -1,6 +1,4 @@
 import { AsyncListData } from "@adobe/react-spectrum";
-import { Dispatch, SetStateAction } from 'react';
-
 export interface IEventsTableRowProps {
     id: string;
     title: string;
@@ -44,11 +42,4 @@ export interface IEventsRemoveDialogProps {
     eventsData: AsyncListData<IEventsTableRowProps>
 }
 
-export interface IUploadImageData {
-    url: String | null;
-    base64String: String | null;
-    imageType: String | null;
-}
 
-export type TImageSetter =  Dispatch<SetStateAction<IUploadImageData>> | 
-                            ((state: IUploadImageData) => Dispatch<SetStateAction<IUploadImageData>>);

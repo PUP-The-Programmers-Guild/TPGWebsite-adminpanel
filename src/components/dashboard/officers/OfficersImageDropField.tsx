@@ -4,14 +4,13 @@ import { FileTrigger } from "react-aria-components";
 import { DropZone } from "@react-spectrum/dropzone";
 import { IUploadImageData, onImageDrop, onImageSelect } from "../shared/FileUploadFunctions";
 
-export function ImageDropField({ thisImageState, thisImageStateSetter } : { thisImageState: IUploadImageData, thisImageStateSetter: React.Dispatch<React.SetStateAction<IUploadImageData>>}) {
+export function OfficersImageDropField({ thisImageState, thisImageStateSetter } : { thisImageState: IUploadImageData, thisImageStateSetter: React.Dispatch<React.SetStateAction<IUploadImageData>>}) {
     return (
         <View flex="col">
-                <LabeledValue label="Event Image" value=""/>
+                <LabeledValue label="Officer Image" value=""/>
                 <DropZone
                     isFilled={!!thisImageState.url}
                     onDrop={(e) => onImageDrop(e, thisImageStateSetter)}
-                    maxWidth="size-6000"
                     getDropOperation={(types) =>
                         (types.has('image/png') || types.has('image/jpeg') || types.has('image/webp'))
                             ? 'copy'
@@ -33,7 +32,7 @@ export function ImageDropField({ thisImageState, thisImageStateSetter } : { this
                                     >
                                         <Button variant="secondary">Select files manually</Button>
                                     </FileTrigger>
-                                    <br/> <br/> Preferred Image Size: 262px (width),  434px (height)
+                                    <br/> <br/> Preferred Image Size: 64px (width),  64px (height)
                                 </Content>
                             </IllustratedMessage>
                     }

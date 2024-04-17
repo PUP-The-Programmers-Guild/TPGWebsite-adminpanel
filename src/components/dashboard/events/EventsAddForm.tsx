@@ -4,9 +4,9 @@ import { Breadcrumbs, Button, ButtonGroup, Checkbox, CheckboxGroup, DatePicker,
 import { useState } from "react";
 import React from "react";
 import { onEventAddFormSubmit } from "./EventsAddFormFunctions";
-import { IUploadImageData } from "./EventsTable.interface";
 import { ImageDropField } from "./EventImageDropField";
 import EventBadge from "./EventBadge";
+import { IUploadImageData } from "../shared/FileUploadFunctions";
 
 
 interface IEventsAddForm {

@@ -1,29 +1,30 @@
 import { ToastQueue } from "@react-spectrum/toast";
-import { IEventsDataProps } from "./EventsTable.interface";
-import type { TEventDataFields } from "./EventsTable.interface";
+import { IOfficerDataProps } from "./OfficersTable.interface";
+import type { TOfficerDataFields } from "./OfficersTable.interface";
 import { IUploadImageData } from "../shared/FileUploadFunctions";
 
-export const onEventRowUpdate = async (selectedRowInfo: IEventsDataProps, updatedRowInfo: IEventsDataProps, updatedImage: IUploadImageData, updatedEventTags: string[]) : Promise<boolean> => {
+export const onOfficerRowUpdate = async (selectedRowInfo: IOfficerDataProps, updatedRowInfo: IOfficerDataProps, updatedImage: IUploadImageData) : Promise<boolean> => {
     const payload = { ...updatedRowInfo };
-    // placeholder solution: need to modify update_event route to accept id instead of event_id
-        payload["event_id"] = payload["id"];
-        delete payload["id"];
-    payload["event_type"] = JSON.stringify(updatedEventTags);
+        payload["officer_id"] = payload["user_id"];
+        delete payload["user_id"];
     for (const key in payload) {
-        if (selectedRowInfo[key as TEventDataFields] === payload[key as TEventDataFields] && key !== "id") {
-            delete payload[key as TEventDataFields];
+        if (selectedRowInfo[key as TOfficerDataFields] === payload[key as TOfficerDataFields] && key !== "user_id") {
+            delete payload[key as TOfficerDataFields];
         }
     }
+
     if (updatedImage.base64String === null && updatedImage.imageType === null) {
         delete payload["image_url"];
     } else {
         payload["image_url"] = updatedImage.base64String as string;
         payload["image_type"] = updatedImage.imageType as string;
     }
+
     let formData = payload;
-    let url = "/api/update_event";
+    let url = "/api/update_officer";
     let isSuccess = false;
-    if (Object.keys(formData).length === 1 && Object.keys(formData)[0] === "id") {
+
+    if (Object.keys(formData).length === 1 && Object.keys(formData)[0] === "user_id") {
         ToastQueue.neutral("No changes detected. Please make changes to update.", {timeout: 3500})
         return isSuccess;
     }
@@ -37,7 +38,7 @@ export const onEventRowUpdate = async (selectedRowInfo: IEventsDataProps, update
         method: "POST",
     }).then(res =>{
         if (res.ok) {
-            ToastQueue.positive("Event updated successfully.", {timeout: 3500})
+            ToastQueue.positive("Officer updated successfully.", {timeout: 3500})
             isSuccess = true;
         } else {
             if (res.status === 500) throw new Error('Error 500, Internal Server Error')
@@ -45,8 +46,9 @@ export const onEventRowUpdate = async (selectedRowInfo: IEventsDataProps, update
             throw new Error("See Console for Details.")
         }
     }).catch((error) => {
-        ToastQueue.negative(`Failed to update Event. ${error}`, {timeout: 3500})
+        ToastQueue.negative(`Failed to update Officer. ${error}`, {timeout: 3500})
         isSuccess = false;
     });
+
     return isSuccess;
 };

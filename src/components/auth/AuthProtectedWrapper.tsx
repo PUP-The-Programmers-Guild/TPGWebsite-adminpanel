@@ -14,7 +14,7 @@ export default function AuthProtectedWrapper({children} : {children: ReactNode})
                 authRouter.push('/');
             }
         } 
-    }, [])
+    }, [authRouter])
 
     return (
         <>
