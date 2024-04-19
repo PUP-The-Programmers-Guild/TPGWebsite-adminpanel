@@ -26,7 +26,7 @@ export default function RevalidateCacheDialog({ dataType, isCacheDialogOpen, set
     }
 
     let onConfirmInvalidateCache = async (dataType:string) : Promise<boolean> => {
-        const revalidationUrl = "/bff/revalidate"
+        const revalidationUrl = `${process.env.NEXT_PUBLIC_BFF_API_URL}/revalidate`;
         const requestBody = {
             "data": dataType,
             "secret" : process.env.NEXT_PUBLIC_REVALIDATION_SECRET
